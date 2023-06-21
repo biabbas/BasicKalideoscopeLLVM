@@ -30,7 +30,7 @@ entry:
   %calltmp1 = call double @putchard(double 7.200000e+01)
   %calltmp2 = call double @putchard(double 1.000000e+01)
   %calltmp3 = call double @putchard(double 6.400000e+01)
-  %calltmp4 = call double @printstar(double 3.000000e+00)
+  %calltmp4 = call double @printstar(double 3.600000e+01)
   %calltmp5 = call double @putchard(double 5.500000e+01)
   %calltmp6 = call double @putchard(double 6.000000e+00)
   %addtmp = fadd double %calltmp5, %calltmp6
