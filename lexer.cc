@@ -11,10 +11,12 @@ private:
   int gettok();
   FILE* f = NULL;
   int getCh();
+  int line_no = 1;
 public:
   LexicalAnalyzer(){}
  LexicalAnalyzer(FILE* fin);
-  ~LexicalAnalyzer(){fprintf(stderr,"Deconstruct");}
+  ~LexicalAnalyzer(){}
+  void Printtoken();
   int CurTok;
   union{
   std::string IdentifierStr; 
@@ -22,7 +24,19 @@ public:
   };
   int NextToken();
 };
+void LexicalAnalyzer::Printtoken(){
+  if(CurTok==tok_eof)
+  fprintf(stderr,"\nline_no: %d \vCurrent Token: End of file. ",line_no);
+  else if(CurTok == tok_number)
+  fprintf(stderr,"\nline_no: %d \vCurrent Token: Number = '%lf'. ",line_no,NumVal);
+  else if(CurTok == tok_identifier)
+  fprintf(stderr,"\nline_no: %d \vCurrent Token: Identifier = '%s'. ",line_no,IdentifierStr.c_str());
+  else if(CurTok < 0)
+  fprintf(stderr,"\nline_no: %d \vCurrent Token: '%s'. ",line_no,IdentifierStr.c_str());
+  else
+  fprintf(stderr,"\nline_no: %d \vCurrent Token '%c'. ",line_no,CurTok);
 
+}
 LexicalAnalyzer::LexicalAnalyzer(FILE* fin){
   if(fin == NULL)
   fprintf(stderr,"Error Opening File\n");
@@ -31,7 +45,7 @@ LexicalAnalyzer::LexicalAnalyzer(FILE* fin){
 }
 
 int LexicalAnalyzer::NextToken(){
-
+  
   CurTok = gettok();
   return CurTok;
 }
@@ -43,10 +57,14 @@ int LexicalAnalyzer::getCh(){
 }
 int LexicalAnalyzer::gettok(){
   static int LastChar = ' ';
-
+   
   // Skip any whitespace.
-  while (isspace(LastChar))
+  while (isspace(LastChar)){
+    if(LastChar == 10)
+    line_no++;
     LastChar = getCh();
+
+    }
   if (isalpha(LastChar)) { // identifier: [a-zA-Z][a-zA-Z0-9]*
     IdentifierStr = LastChar;
     while (isalnum((LastChar = getCh())))
