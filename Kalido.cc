@@ -497,10 +497,13 @@ if(!MainP){
 int c;
 fprintf(stderr,"Do you want to compile the code? y/n\v");
 c=getchar();
-if(c == 'y' || c == 'Y')
-fprintf(stderr,"Compiled");
+if(c == 'y' || c == 'Y'){
+std::string Klib = "lib.o";//Libraries that contain the externed code.
+std::string ComCommand = "clang " + Klib + ' ' + Output + " -o " + Output + ".e";
+system(ComCommand.c_str());
+}
 else
-fprintf(stderr,"Not Compiled");
+fprintf(stderr,"Code Not Compiled");
   return 0;
 }
 
