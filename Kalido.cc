@@ -280,7 +280,7 @@ static std::unique_ptr<ExprAST> ParseBinOpRHS(int ExprPrec,
 // expression
 ///   ::= primary binoprhs
 ///
-static std::unique_ptr<ExprAST> ParseExpression() {
+static std::unique_ptr<ExprAST>  ParseExpression() {
   auto LHS = ParsePrimary();
   if (!LHS)
     return nullptr;
@@ -299,14 +299,19 @@ static std::unique_ptr<FunctionAST> ParseDefinition() {
     if (auto F = ParseExpression()){
   
     auto M = std::make_unique<FunctionAST>(std::move(Proto), std::move(F));
-
+    if(lexer->CurTok == ';')  
     lexer->NextToken();
-    for(int i=0;i<10 && lexer->CurTok != '}';i++){
+    for(int i=0;i<10 && lexer->CurTok != '}' && 
+                        lexer->CurTok != tok_def &&
+                        lexer->CurTok != tok_extern &&
+                        lexer->CurTok != tok_eof            ;i++){
     
     M->Push(std::move(ParseExpression()));
+    if(lexer->CurTok == ';') 
     lexer->NextToken();
 
     }
+    if(lexer->CurTok == '}')
     lexer->NextToken();
     return M;
   } 
@@ -316,19 +321,6 @@ static std::unique_ptr<FunctionAST> ParseDefinition() {
   }
   return nullptr;
 }
-/// toplevelexpr ::= expression
-static std::unique_ptr<FunctionAST> ParseTopLevelExpr() {
-  if (auto E = ParseExpression()) {
-    // Make an anonymous proto.
-    auto Proto = std::make_unique<PrototypeAST>("__anon_expr",
-                                                std::vector<std::string>());
-    return std::make_unique<FunctionAST>(std::move(Proto), std::move(E));
-  }
-  return nullptr;
-}
-
-
-
 
 
 /// external ::= 'extern' prototype
@@ -392,29 +384,15 @@ static void HandleExtern() {
     lexer->NextToken();
   }
 }
-static void HandleTopLevelExpression() {
-  // Evaluate a top-level expression into an anonymous function.
-  if (auto FAst = ParseTopLevelExpr()){
-  if(auto *FnIr = FAst->codegen()){
-    fprintf(stderr, "Read a top-level expr\n");
-    //FnIr->print(errs());
-    fprintf(stderr, "\n");
-  } 
-  } else {
-    // Skip token for error recovery.
-    lexer->NextToken();
-  }
-}
 
 
-/// top ::= definition | external | expression | ';'
 static void ParseProgram() {
   while (true) {
     fprintf(stderr, "ready> ");
     switch (lexer->CurTok) {
     case tok_eof:
       return;
-    case ';': // ignore top-level semicolons.
+    case ';':
       lexer->NextToken();
       break;
     case tok_def:
@@ -424,7 +402,8 @@ static void ParseProgram() {
       HandleExtern();
       break;
     default:
-      HandleTopLevelExpression();
+      LogError("Syntax Error");
+      lexer->NextToken();
       break;
     }
   }
@@ -466,7 +445,7 @@ lexer = new LexicalAnalyzer();
 
 
   ParseProgram();
-  
+  delete lexer;
   InitializeAllTargetInfos();
   InitializeAllTargets();
   InitializeAllTargetMCs();
@@ -501,16 +480,27 @@ lexer = new LexicalAnalyzer();
 
     if (outputFile.has_error()) {
         errs() << "Error writing to the output file\n";
-        // Handle the error appropriately
+        return 0;
     } else {
         outs() << "LLVM IR successfully written to " << Output << "\n";
     }
 } else {
     errs() << "Error opening the output file\n";
-    // Handle the error appropriately
+    return 0;
+}
+Function* MainP = TheModule->getFunction("main");
+if(!MainP){
+  fprintf(stderr,"Warning: No Main Function found\n");
+  return 0;
 }
 
-
+int c;
+fprintf(stderr,"Do you want to compile the code? y/n\v");
+c=getchar();
+if(c == 'y' || c == 'Y')
+fprintf(stderr,"Compiled");
+else
+fprintf(stderr,"Not Compiled");
   return 0;
 }
 
