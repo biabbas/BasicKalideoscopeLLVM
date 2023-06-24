@@ -490,20 +490,21 @@ lexer = new LexicalAnalyzer();
 }
 Function* MainP = TheModule->getFunction("main");
 if(!MainP){
-  fprintf(stderr,"Warning: No Main Function found\n");
+  outs()<< "Warning: No Main Function found\n";
   return 0;
 }
 
 int c;
-fprintf(stderr,"Do you want to compile the code? y/n\v");
+outs()<< "Do you want to compile the code? y/n\v";
 c=getchar();
 if(c == 'y' || c == 'Y'){
 std::string Klib = "lib.o";//Libraries that contain the externed code.
 std::string ComCommand = "clang " + Klib + ' ' + Output + " -o " + Output + ".e";
 system(ComCommand.c_str());
+outs()<< "Executable file generated with name: "+Output+".e\n";
 }
 else
-fprintf(stderr,"Code Not Compiled");
+outs()<<"Code Not Compiled";
   return 0;
 }
 

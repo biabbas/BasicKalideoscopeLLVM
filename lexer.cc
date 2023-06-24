@@ -10,7 +10,6 @@ class LexicalAnalyzer
 private:
   int gettok();
   FILE* f = NULL;
-  int getCh();
   int line_no = 1;
 public:
   LexicalAnalyzer(){}
@@ -49,12 +48,7 @@ int LexicalAnalyzer::NextToken(){
   CurTok = gettok();
   return CurTok;
 }
-int LexicalAnalyzer::getCh(){
-  if(f==NULL)
-  return getchar();
-  else
-  return getc(f);
-}
+
 int LexicalAnalyzer::gettok(){
   static int LastChar = ' ';
    
@@ -62,12 +56,12 @@ int LexicalAnalyzer::gettok(){
   while (isspace(LastChar)){
     if(LastChar == 10)
     line_no++;
-    LastChar = getCh();
+    LastChar = (f==NULL)? getchar(): getc(f);
 
     }
   if (isalpha(LastChar)) { // identifier: [a-zA-Z][a-zA-Z0-9]*
     IdentifierStr = LastChar;
-    while (isalnum((LastChar = getCh())))
+    while (isalnum((LastChar = (f==NULL)? getchar(): getc(f))))
       IdentifierStr += LastChar;
 
     if (IdentifierStr == "def")
@@ -91,7 +85,7 @@ if (IdentifierStr == "in")
     std::string NumStr;
     do {
       NumStr += LastChar;
-      LastChar = getCh();
+      LastChar = (f==NULL)? getchar(): getc(f);
     } while (isdigit(LastChar) || LastChar == '.');
 
     NumVal = strtod(NumStr.c_str(), nullptr);
@@ -100,7 +94,7 @@ if (IdentifierStr == "in")
 
   if (LastChar == '#') {//comments
     do
-      LastChar = getCh();
+      LastChar = (f==NULL)? getchar(): getc(f);
     while (LastChar != EOF && LastChar != '\n' && LastChar != '\r');
 
     if (LastChar != EOF)
@@ -112,6 +106,6 @@ if (IdentifierStr == "in")
     return tok_eof;
 
   int ThisChar = LastChar;
-  LastChar = getCh();
+  LastChar = (f==NULL)? getchar(): getc(f);
   return ThisChar;
 }
