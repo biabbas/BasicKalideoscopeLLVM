@@ -426,10 +426,10 @@ lexer->NextToken();
 system("rm 8num.txt");
 int L  = (int)lexer->NumVal + 1 + 48;
 Output.insert(6,1,(char)L);
+delete lexer;
 }
 else
 Output = argv[1];
-delete lexer;
 if(argc == 3){
   lexer = new LexicalAnalyzer(fopen(argv[2],"r"));
 }
@@ -493,7 +493,7 @@ if(!MainP){
   outs()<< "Warning: No Main Function found\n";
   return 0;
 }
-
+else{
 int c;
 outs()<< "Do you want to compile the code? y/n\v";
 c=getchar();
@@ -506,6 +506,7 @@ outs()<< "Executable file generated with name: "+Output+".e\n";
 else
 outs()<<"Code Not Compiled";
   return 0;
+  
 }
 
 
