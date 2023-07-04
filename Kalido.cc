@@ -420,7 +420,7 @@ std::string Output;
 
 if(argc == 1){
 Output = "output.ll";
-system("ls | grep output | wc -l > 8num.txt");
+system("ls | grep output*.ll | wc -l > 8num.txt");
 lexer = new LexicalAnalyzer(fopen("8num.txt","r"));
 lexer->NextToken();
 system("rm 8num.txt");
@@ -497,7 +497,7 @@ else{
 int c;
 outs()<< "Do you want to compile the code? y/n\v";
 c=getchar();
-if(c == 'y' || c == 'Y'){
+if(c == 'y' || c == 'Y' || c==EOF){
 std::string Klib = "lib.o";//Libraries that contain the externed code.
 std::string ComCommand = "clang " + Klib + ' ' + Output + " -o " + Output + ".e";
 system(ComCommand.c_str());
